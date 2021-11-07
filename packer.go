@@ -53,14 +53,13 @@ func (b *Bin) GetVolume() int64 {
 	return b.Width * b.Height
 }
 
-func (b *Bin) PutItem(item *Item, p Pivot, allowRotation bool) (fit bool) {
+func (b *Bin) PutItem(item *Item, p Pivot) (fit bool) {
 	item.Position = p
-	z := 0
-	if allowRotation {
-		z = 1
-	}
-	for i := 0; i < z; i++ {
-		item.RotationType = RotationType(i)
+
+	for i := 0; i < 1; i++ {
+		if item.RotationType != RotationType_NEVER {
+			item.RotationType = RotationType(i)
+		}
 		d := item.GetDimension()
 		if b.GetWidth() < p[0]+d[0] || b.GetHeight() < p[1]+d[1] {
 			continue
@@ -91,11 +90,13 @@ func (b *Bin) String() string {
 type RotationType int
 
 const (
-	RotationType_WH RotationType = iota
+	RotationType_NEVER RotationType = iota
+	RotationType_WH
 	RotationType_HW
 )
 
 var RotationTypeStrings = [...]string{
+	"RotationType_NEVER (w,h)",
 	"RotationType_WH (w,h)",
 	"RotationType_HW (h,w)",
 }
@@ -169,6 +170,8 @@ func (i *Item) GetVolume() int64 {
 
 func (i *Item) GetDimension() (d Dimension) {
 	switch i.RotationType {
+	case RotationType_NEVER:
+		fallthrough
 	case RotationType_WH:
 		d = Dimension{i.GetWidth(), i.GetHeight()}
 	case RotationType_HW:
