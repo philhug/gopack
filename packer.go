@@ -53,9 +53,13 @@ func (b *Bin) GetVolume() int64 {
 	return b.Width * b.Height
 }
 
-func (b *Bin) PutItem(item *Item, p Pivot) (fit bool) {
+func (b *Bin) PutItem(item *Item, p Pivot, allowRotation bool) (fit bool) {
 	item.Position = p
-	for i := 0; i < 2; i++ {
+	z := 0
+	if allowRotation {
+		z = 1
+	}
+	for i := 0; i < z; i++ {
 		item.RotationType = RotationType(i)
 		d := item.GetDimension()
 		if b.GetWidth() < p[0]+d[0] || b.GetHeight() < p[1]+d[1] {
